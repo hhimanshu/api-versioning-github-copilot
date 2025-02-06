@@ -32,3 +32,9 @@ Once the application is running, you can access:
 ## Available Endpoints
 
 - `GET /hello` - Returns a hello world message
+
+## Resources
+- [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [uv](https://docs.astral.sh/uv/)
+- [ruff](https://docs.astral.sh/ruff/)
