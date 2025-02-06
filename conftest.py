@@ -2,6 +2,8 @@ import asyncio
 import pytest_asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from repositories.book_repository import BookRepository
+
 TEST_DB = "test-db"
 
 @pytest_asyncio.fixture(scope="session")
@@ -29,3 +31,14 @@ async def mongo_client():
     finally:
         await client.drop_database(TEST_DB)
         client.close()
+
+@pytest_asyncio.fixture(scope="function")
+async def book_repository(mongo_client):
+    # Ensure we have a clean database for each test
+    await mongo_client[TEST_DB].books.delete_many({})
+    repo = BookRepository(mongo_client, TEST_DB)
+    try:
+        await repo.create_indexes()
+    except Exception as e:
+        print(f"Error creating indexes: {e}")
+    return repo
