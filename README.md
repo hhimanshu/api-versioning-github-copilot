@@ -11,7 +11,7 @@ uv sync
 
 2. Run the FastAPI application:
 ```bash
-uvicorn src.api.app:app --reload
+uvicorn api.app:app --reload
 ```
 
 3. To Upgrade all dependencies:
