@@ -25,6 +25,10 @@ class RatingStats(BaseModel):
     three_star: int = Field(default=0, ge=0)
     four_star: int = Field(default=0, ge=0)
     five_star: int = Field(default=0, ge=0)
+    
+@staticmethod
+def _get_current_utc_time() -> datetime:
+    return datetime.now(tz=timezone.utc)
 
 class Book(BaseModel):
     model_config = ConfigDict(
@@ -58,7 +62,7 @@ class Book(BaseModel):
     isbn: str = Field(..., pattern=r'^(?:\d{10}|\d{13})$')
     price: float = Field(..., gt=0)
     status: BookStatus = Field(default=BookStatus.PENDING)
-    created_date: datetime = Field(default_factory=datetime.now(tz=timezone.utc))
+    created_date: datetime = Field(default_factory=_get_current_utc_time)
     updated_date: Optional[datetime] = None
     inactive_date: Optional[datetime] = None
     cover_images: List[str] = Field(default_factory=list)
