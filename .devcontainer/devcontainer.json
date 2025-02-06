@@ -1,0 +1,45 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "BookHub API",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	//"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/workspaces",
+	"features": {
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+		"ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {},
+		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
+		"ghcr.io/jsburckhardt/devcontainer-features/ruff:1": {}
+	},
+	// Add git credentials sharing
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"git.enableCommitSigning": false
+			},
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"mongodb.mongodb-vscode",
+				"charliermarsh.ruff",
+				"GitHub.copilot",
+				"GitHub.copilot-chat"
+			]
+		}
+	},
+	"mounts": [
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+	],
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		27017
+	],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "chmod a+x .devcontainer/postCreate.sh && .devcontainer/postCreate.sh",
+	// Configure tool-specific properties.
+	// "customizations": {},
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "vscode"
+}
