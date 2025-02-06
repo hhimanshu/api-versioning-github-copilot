@@ -66,7 +66,7 @@ class Book(BaseModel):
     updated_date: Optional[datetime] = None
     inactive_date: Optional[datetime] = None
     cover_images: List[str] = Field(default_factory=list)
-    genres: List[str] = Field(..., min_items=1)
+    genres: List[str] = Field(..., min_length=1)
     book_format: BookFormat
     ratings: RatingStats = Field(default_factory=RatingStats)
     number_of_reviews: int = Field(default=0, ge=0)
