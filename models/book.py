@@ -70,3 +70,10 @@ class Book(BaseModel):
     book_format: BookFormat
     ratings: RatingStats = Field(default_factory=RatingStats)
     number_of_reviews: int = Field(default=0, ge=0)
+
+
+class PaginatedBooks(BaseModel):
+    books: List[Book]
+    total: int
+    skip: int
+    limit: int

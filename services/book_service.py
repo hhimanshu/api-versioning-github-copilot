@@ -7,7 +7,7 @@ from exceptions.book_exceptions import (
     InvalidBookOperationException
 )
 from repositories.book_repository import BookRepository
-from models.book import Book, BookStatus
+from models.book import Book, BookStatus, PaginatedBooks
 from services.api_version import ApiVersion
 
 
@@ -53,7 +53,7 @@ class BookService:
         limit: int = 100,
         status: Optional[BookStatus] = BookStatus.ACTIVE,
         api_version: ApiVersion = ApiVersion.LATEST
-    ) -> List[Book]:
+    ) -> List[Book] | PaginatedBooks:
         """Get all books with optional filtering"""
         if skip < 0:
             raise InvalidBookDataException("Skip value cannot be negative")
@@ -62,9 +62,12 @@ class BookService:
         if limit > 100:
             limit = 100  # Enforce maximum limit
 
-        return await self.book_repository.get_all(skip, limit, status)
+        if api_version == ApiVersion.V2025_03_01_PREVIEW:
+            return await self.book_repository.get_books_paginated(skip, limit)
+        else:
+            return await self.book_repository.get_all(skip, limit, status)
 
-    async def update_book(self, book_id: str, 
+    async def update_book(self, book_id: str,
                           book_update: Book,
                           api_version: ApiVersion = ApiVersion.LATEST) -> Book:
         """Update a book with validation"""

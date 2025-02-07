@@ -3,7 +3,7 @@ from typing import List, Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from pymongo.errors import DuplicateKeyError
-from models.book import Book, BookStatus
+from models.book import Book, BookStatus, PaginatedBooks
 
 class BookRepository:
     def __init__(self, mongo_client: AsyncIOMotorClient, database_name: str):
@@ -86,3 +86,10 @@ class BookRepository:
             return bool(result)
         except Exception as e:
             raise ValueError(f"Error deleting book {book_id}: {str(e)}")
+    
+    async def get_books_paginated(self, skip: int = 0, limit: int = 10) -> PaginatedBooks:
+        """Retrieve a paginated list of books."""
+        total = await self.collection.count_documents({})
+        cursor = self.collection.find().skip(skip).limit(limit)
+        books = [Book.model_validate(book) async for book in cursor]
+        return PaginatedBooks(books=books, total=total, skip=skip, limit=limit)  # noqa: F821

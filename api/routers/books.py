@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
-from models.book import Book, BookStatus
+from models.book import Book, BookStatus, PaginatedBooks
 from services.api_version import ApiVersion, get_api_version
 from services.book_service import BookService
 from dependencies.service import get_book_service
@@ -28,7 +28,7 @@ async def create_book(
     except (InvalidBookDataException, BookAlreadyExistsException) as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/", response_model=List[Book])
+@router.get("/", response_model=List[Book] | PaginatedBooks)
 async def get_books(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, gt=0, le=100),
