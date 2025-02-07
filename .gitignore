@@ -1,2 +1,3 @@
 **/__pycache__/
 api/routers/__pycache__/test_hello_world.cpython-313-pytest-8.3.4.pyc
+api/__pycache__/app.cpython-313.pyc

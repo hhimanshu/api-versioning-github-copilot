@@ -8,6 +8,8 @@ from exceptions.book_exceptions import (
 )
 from repositories.book_repository import BookRepository
 from models.book import Book, BookStatus
+from services.api_version import ApiVersion
+
 
 class BookService:
     def __init__(self, book_repository: BookRepository):
@@ -24,10 +26,10 @@ class BookService:
         if book.price and book.price < 0:
             raise InvalidBookDataException("Book price cannot be negative")
 
-    async def create_book(self, book: Book) -> Book:
+    async def create_book(self, book: Book, api_version: ApiVersion = ApiVersion.LATEST) -> Book:
         """Create a new book with validation"""
         self._validate_book_data(book)
-        
+
         # Set default values for new books
         book.status = BookStatus.ACTIVE
         book.created_date = datetime.now(tz=timezone.utc)
@@ -38,7 +40,7 @@ class BookService:
         except ValueError as e:
             raise BookAlreadyExistsException(str(e))
 
-    async def get_book(self, book_id: str) -> Book:
+    async def get_book(self, book_id: str, api_version: ApiVersion = ApiVersion.LATEST) -> Book:
         """Get a book by ID with validation"""
         book = await self.book_repository.get_one(book_id)
         if not book:
@@ -49,7 +51,8 @@ class BookService:
         self,
         skip: int = 0,
         limit: int = 100,
-        status: Optional[BookStatus] = BookStatus.ACTIVE
+        status: Optional[BookStatus] = BookStatus.ACTIVE,
+        api_version: ApiVersion = ApiVersion.LATEST
     ) -> List[Book]:
         """Get all books with optional filtering"""
         if skip < 0:
@@ -58,29 +61,31 @@ class BookService:
             raise InvalidBookDataException("Limit must be greater than 0")
         if limit > 100:
             limit = 100  # Enforce maximum limit
-            
+
         return await self.book_repository.get_all(skip, limit, status)
 
-    async def update_book(self, book_id: str, book_update: Book) -> Book:
+    async def update_book(self, book_id: str, 
+                          book_update: Book,
+                          api_version: ApiVersion = ApiVersion.LATEST) -> Book:
         """Update a book with validation"""
         existing_book = await self.get_book(book_id)
-        
+
         if existing_book.status == BookStatus.INACTIVE:
             raise InvalidBookOperationException(
                 f"Cannot update inactive book with ID {book_id}"
             )
 
         self._validate_book_data(book_update)
-        
+
         updated_book = await self.book_repository.update(book_id, book_update)
         if not updated_book:
             raise BookNotFoundException(f"Book with ID {book_id} not found")
         return updated_book
 
-    async def delete_book(self, book_id: str) -> None:
+    async def delete_book(self, book_id: str, api_version: ApiVersion = ApiVersion.LATEST) -> None:
         """Soft delete a book"""
         existing_book = await self.get_book(book_id)
-        
+
         if existing_book.status == BookStatus.INACTIVE:
             raise InvalidBookOperationException(
                 f"Book with ID {book_id} is already inactive"

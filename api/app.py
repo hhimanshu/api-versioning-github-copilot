@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+
+from api.middleware.version_middleware import APIVersionMiddleware
 from .routers import hello, books
 
 app = FastAPI(
@@ -10,6 +12,9 @@ app = FastAPI(
 # Include routers
 app.include_router(hello.router)
 app.include_router(books.router)
+
+# Include middleware
+app.add_middleware(APIVersionMiddleware)
 
 if __name__ == "__main__":
     import uvicorn
